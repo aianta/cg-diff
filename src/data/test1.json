@@ -1,0 +1,50 @@
+{
+    "nodes" : ["A","B","C","E","F","G","K","L","M","N"], 
+    "links" : [ 
+        {
+            "type" : "normal",
+            "source" : "A",
+            "target" : "E"
+        },
+        {
+            "type" : "normal",
+            "source" : "B",
+            "target" : "E"
+        },
+        {
+            "type" : "normal",
+            "source" : "B",
+            "target" : "C"
+        },
+        {
+            "type" : "normal",
+            "source" : "C",
+            "target" : "E"
+        },
+        {
+            "type" : "normal",
+            "source" : "E",
+            "target" : "G"
+        },
+        {
+            "type" : "normal",
+            "source" : "E",
+            "target" : "F"
+        },
+        {
+            "type" : "normal",
+            "source" : "L",
+            "target" : "M"
+        },
+        {
+            "type" : "normal",
+            "source" : "M",
+            "target" : "K"
+        },
+        {
+            "type" : "normal",
+            "source" : "K",
+            "target" : "L"
+        }
+    ]
+}
