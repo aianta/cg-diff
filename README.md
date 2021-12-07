@@ -19,7 +19,7 @@ In the final report we tested the following configruations:
 |hello world with stream | hello world with stream and string builder |
 |hello world | hello world with stream |
 
-For the final report we ran each configuration 5 times copying and pasting the 'compute time' value into an excel spreadsheet (available in the repository) which computed the mean median and standard deviation. The experiment was run on a machine with an Intel i9-9900K processor @5.0GHz with 64GB of RAM. It is normal for the page to crash after several executions in a row, when this happens simply reload the page to continue.
+For the final report we ran each configuration 5 times copying and pasting the 'compute time' value into an excel spreadsheet (available in the repository) which computed the mean median and standard deviation. The experiment was run on a machine with an Intel i9-9900K processor @5.1GHz with 64GB of RAM. It is normal for the page to crash after several executions in a row, when this happens simply reload the page to continue.
 
 ## Building/Running from the repo
 
