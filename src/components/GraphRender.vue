@@ -42,6 +42,16 @@ export default {
         }
     },
     methods: {
+        zoomToNode(node){
+             const distance = 250
+            const distRatio = 1 + distance/Math.hypot(node.x, node.y, node.z);
+
+            this.render.cameraPosition(
+                { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio }, // new position
+                node, // lookAt ({ x, y, z })
+                3000  // ms transition duration
+            )
+        },
         initGraph(){
             console.log(this.$refs.root)
 
@@ -58,15 +68,31 @@ export default {
                 .width(this.width?this.width:this.$refs.root.clientWidth)
                 .graphData(this.graph)
                 .nodeAutoColorBy('owner')
+                .linkLabel(link=>link.type)
+                .linkWidth(2)
                 .linkAutoColorBy('owner')
+                
                 .nodeThreeObject(node => {
-                    const sprite = new SpriteText(node.id)
+       
+                    const sprite = new SpriteText(node.id.length > 300?"<META_NODE>":node.id)
                     sprite.material.depthWrite = false;
                     sprite.color = node.color;
-                    sprite.textHeight = 8;
+                    sprite.textHeight = 10;
                     return sprite
                 })
+               
+                this.render.numDimensions(2)
+                this.render.d3Force('charge').strength(-(Math.min(15*(this.graph.nodes.length + this.graph.links.length),100000)))
+                
 
+                const distance = 1000
+                //const distRatio = 1 + distance/Math.hypot(0, 0, 0);
+
+                this.render.cameraPosition(
+                    {x: 0, y: 0, z: distance},
+                    {x:0,y:0,z:0},
+                    1000
+                )
         }
     }
 }

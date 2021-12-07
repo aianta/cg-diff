@@ -1,17 +1,26 @@
 <template>
   <div id="app">
-    <b-container>
+    <b-container fluid>
       <b-row>
         <b-col>
           <div class="d-flex flex-column">
             <!-- <img alt="Vue logo" src="./assets/logo.png"> -->
+            <div class="d-flex">
+              <h2>Graph 1</h2>
+              <b-form-select v-model="graph1" :options="dataOptions"></b-form-select>
+            </div>
+            <div class="d-flex">
+              <h2>Graph 2</h2>
+              <b-form-select v-model="graph2" :options="dataOptions"></b-form-select>
+            </div>
+            
             <b-btn @click="churn()">compute</b-btn>
             <p>{{computeTime}}ms</p>
             <!-- <h1>gDiff</h1>
             <GraphRender :graph="gDiff" :width="300" :height="300"></GraphRender> -->
             <h1>hGraph</h1>
-            <GraphRender :graph="hGraph" :width="600" :height="600"></GraphRender>
-            <h1>Edge Decomposition</h1>
+            <GraphRender :graph="hGraph"></GraphRender>
+            <!-- <h1>Edge Decomposition</h1> -->
             <!-- <GraphRender v-for="(cluster,i) in clusters"
               :key="i"
               :graph="cluster"
@@ -31,8 +40,11 @@
 
 import cg1 from '@/data/callgraph-simple-1.json'
 import cg2 from '@/data/callgraph-simple-2.json'
-// import cg1 from '@/data/test1.json'
-// import cg2 from '@/data/test2.json'
+import cg3 from '@/data/callgraph-read-file.json'
+import cg4 from '@/data/test1.json'
+import cg5 from '@/data/test2.json'
+import cg6 from '@/data/callgraph-stream.json'
+import cg7 from '@/data/callgraph-stream-string-builder.json'
 import GraphRender from './components/GraphRender.vue';
 
 function makeHGraph(g1,g2){
@@ -47,7 +59,7 @@ function makeHGraph(g1,g2){
    * Load all the nodes from g1 into gDiff
    */
   for (let entry of g1.nodes){
-      console.log(entry)
+      //console.log(entry)
       let node = {
         id: entry,
         /* 1 -> belongs to g1
@@ -56,7 +68,7 @@ function makeHGraph(g1,g2){
          */
         owner: 1 
       }
-      console.log(node)
+      //console.log(node)
       gDiffNodes.set(entry, node)
   }
 
@@ -64,7 +76,7 @@ function makeHGraph(g1,g2){
    * Read through all the nodes from g2 and mark their ownership
    */
   for (let entry of g2.nodes){
-    console.log(entry)
+    //console.log(entry)
     //If gDiff already has an entry for this node, then the node must belong in both g1 & g2, so owner is set to 3.
     if (gDiffNodes.has(entry)){
       let node = gDiffNodes.get(entry)
@@ -82,13 +94,13 @@ function makeHGraph(g1,g2){
   /*
    * Load all edges from g1 into gDiff
    */
-  console.log('g1 edge count: ' + g1.links.length)
+  //console.log('g1 edge count: ' + g1.links.length)
   for (let entry of g1.links){
     let edge = JSON.parse(JSON.stringify(entry));
     edge.owner = 1 //Label as owned by g1
     gDiffEdges.set(edgeId(entry), edge)
   }
-  console.log('gDiffEdges.size : ' + gDiffEdges.size)
+  //console.log('gDiffEdges.size : ' + gDiffEdges.size)
 
   for(let entry of g2.links){
     // If either of the nodes belong only to g2, it is impossible for the edge to exist in both graphs.
@@ -157,19 +169,19 @@ function findDuplicatedNodes(clusters){
     )
   })
 
-  console.log('seen nodes:')
-  for (const e of resultSet){
-    console.log(e)
-  }
+  //console.log('seen nodes:')
+  // for (const e of resultSet){
+  //   //console.log(e)
+  // }
 
   return resultSet
 }
 
 // eslint-disable-next-line no-unused-vars
-function printClusterNodes(cluster){
-  console.log("cluster nodes:")
-  Array.from(cluster.nodes.values()).forEach(node=>console.log(node.id))
-}
+// function printClusterNodes(cluster){
+//   console.log("cluster nodes:")
+//   Array.from(cluster.nodes.values()).forEach(node=>console.log(node.id))
+// }
 
 // eslint-disable-next-line no-unused-vars
 function decomposeByNodes(clusters, globalNodeMap){
@@ -249,16 +261,16 @@ function computeNodeClusters(owner, nodeMap, excludeNodes){
    */
   for (const [id, node] of nodeMap.entries()){
     if (node.owner === owner && !excludeNodes.has(node.id)){
-       console.log('looking for node: ' + id + " in existing clusters")
+       //console.log('looking for node: ' + id + " in existing clusters")
       //Find a cluster that already contains this node
       let containingCluster = result.find(cluster=>cluster.nodes.has(id))
       if (containingCluster === undefined){
-        console.log('Node not found! building cluster')
+        //console.log('Node not found! building cluster')
         //If we can't find such a cluster, it's time to a make a new cluster
         //containing this edge.
         result.push(bfsClusterNode(owner, [node.id], nodeMap, excludeNodes))
       }else{
-        console.log("Node found moving along!")
+        //console.log("Node found moving along!")
       }
     }
    
@@ -297,16 +309,16 @@ function computeClusters(owner, nodeMap, edgeMap){
    */
   for (const [id, edge] of edgeMap.entries()){
     if (edge.owner === owner){
-       console.log('looking for edge: ' + id + " in existing clusters")
+       //console.log('looking for edge: ' + id + " in existing clusters")
       //Find a cluster that already contains this edge
       let containingCluster = result.find(cluster=>cluster.links.has(id))
       if (containingCluster === undefined){
-        console.log('Edge not found! building cluster')
+        //console.log('Edge not found! building cluster')
         //If we can't find such a cluster, it's time to a make a new cluster
         //containing this edge.
         result.push(bfsCluster(owner, [edge.target,edge.source], nodeMap))
       }else{
-        console.log("Edge found moving along!")
+        //console.log("Edge found moving along!")
       }
     }
    
@@ -320,8 +332,8 @@ function computeClusters(owner, nodeMap, edgeMap){
 //Optionally excludes given nodes from the search, including edges leading into or coming out
 //of them.
 function bfsClusterNode(owner, toSearch, nodeMap, excludeNodes=new Set()){
-  console.log("building clusters for owner " + owner)
-  console.log(toSearch)
+  //console.log("building clusters for owner " + owner)
+  //console.log(toSearch)
   let cluster = {
     type: 'edge',
     owner: owner,
@@ -331,9 +343,9 @@ function bfsClusterNode(owner, toSearch, nodeMap, excludeNodes=new Set()){
 
   //Breadth-frist search 
   while(toSearch.length > 0){
-    console.log(toSearch)
+    //console.log(toSearch)
     let currNode = toSearch.pop() //Pop's the label off toSearch
-    console.log("toSearch popped value: " + currNode)
+    //console.log("toSearch popped value: " + currNode)
     currNode = nodeMap.get(currNode) //Resolves the underlying node
     //Add the current node to the cluster
     cluster.nodes.set(currNode.id, JSON.parse(JSON.stringify(currNode)))
@@ -363,8 +375,8 @@ function bfsClusterNode(owner, toSearch, nodeMap, excludeNodes=new Set()){
     })
   }
 
-  console.log("Built cluster!")
-  console.log(cluster)
+  //console.log("Built cluster!")
+  //console.log(cluster)
 
   return cluster
 }
@@ -373,8 +385,8 @@ function bfsClusterNode(owner, toSearch, nodeMap, excludeNodes=new Set()){
 //Optionally excludes given nodes from the search, including edges leading into or coming out
 //of them.
 function bfsCluster(owner, toSearch, nodeMap, excludeNodes=new Set()){
-  console.log("building clusters for owner " + owner)
-  console.log(toSearch)
+  //console.log("building clusters for owner " + owner)
+  //console.log(toSearch)
   let cluster = {
     type: 'edge',
     owner: owner,
@@ -384,9 +396,9 @@ function bfsCluster(owner, toSearch, nodeMap, excludeNodes=new Set()){
 
   //Breadth-frist search 
   while(toSearch.length > 0){
-    console.log(toSearch)
+    //console.log(toSearch)
     let currNode = toSearch.pop() //Pop's the label off toSearch
-    console.log("toSearch popped value: " + currNode)
+    //console.log("toSearch popped value: " + currNode)
     currNode = nodeMap.get(currNode) //Resolves the underlying node
     //Add the current node to the cluster
     cluster.nodes.set(currNode.id, JSON.parse(JSON.stringify(currNode)))
@@ -412,8 +424,8 @@ function bfsCluster(owner, toSearch, nodeMap, excludeNodes=new Set()){
     })
   }
 
-  console.log("Built cluster!")
-  console.log(cluster)
+  //console.log("Built cluster!")
+  //console.log(cluster)
 
   return cluster
 }
@@ -542,7 +554,24 @@ function buildGraph(nodeMap, edgeMap){
     );
   
 
-}
+  }
+
+
+  const [graph,nodeMap,edgeMap] = gDiff(g1,g2)
+
+  let rawClusters =  decomposeByEdge(graph,nodeMap,edgeMap)
+
+  let nodeClusters = decomposeByNodes(rawClusters, nodeMap)
+
+  let hGraphNodeMap = clustersToNodeMap(nodeClusters)
+  let hGraphEdgeMap = nodeMapToEdgeMap(hGraphNodeMap,edgeMap)
+
+  let hGraph = {
+    nodes: Array.from(hGraphNodeMap.values()),
+    links: Array.from(hGraphEdgeMap.values())
+  }
+
+  return hGraph
 }
 
 
@@ -553,8 +582,38 @@ export default {
   components: { GraphRender },
   data(){
     return {
-      graph1: cg1,
-      graph2: cg2,
+      dataOptions: [
+        {
+        value: cg1,
+        text: 'hello world'
+      },{
+        value:cg2,
+        text: 'hello world with system property'
+      },
+      {
+        value: cg3,
+        text: 'hello world with read file'
+      },
+      {
+        value: cg6,
+        text: 'hello world with stream'
+      },
+      {
+        value: cg7,
+        text: 'hello world with stream and string builder'
+      },
+      {
+        value: cg4,
+        text: 'test-1'
+      },
+      {
+        value: cg5,
+        text: 'test-2'
+      }
+    
+      ],
+      graph1: undefined,
+      graph2: undefined,
       gDiff: undefined,
       clusters: [],
       nodeClusters: [],
@@ -570,82 +629,22 @@ export default {
   },
   methods:{
     churn(){
-      let start = Date.now()
+  
       console.log("Computing graph difference")
 
       let instance = this
-
+      let start = Date.now()
       this.$worker.run(
-        gDiff,
+        makeHGraph,
         [this.$data.graph1,this.$data.graph2]
       ).then(result=>{
-        const [graph, nodeMap,edgeMap] = result
-        instance.gDiff = graph
-
-        instance.$worker.run(
-          decomposeByEdge,
-          [graph,nodeMap,edgeMap])
-          .then(rawClusters=>{
-
-              instance.$worker.run(
-                decomposeByNodes,
-                [rawClusters, nodeMap]
-              ).then(nodeClusters=>{
-
-                  instance.$worker.run(
-                    clustersToNodeMap,
-                    [nodeClusters]
-                  ).then(hGraphNodeMap=>{
-
-                    instance.$worker.run(
-                      nodeMapToEdgeMap,
-                      [hGraphNodeMap, edgeMap]
-                    ).then(hGraphEdgeMap => {
-
-                      let newHGraph = {
-                        nodes: Array.from(hGraphNodeMap.values()),
-                        links: Array.from(hGraphEdgeMap.values())
-                      }
-
-                      instance.hGraph = newHGraph;
-                      instance.computeTime = Date.now() - start
-                    })
-                  })
-
-              })
-
-          })
+        instance.hGraph = result
+        instance.computeTime = Date.now() - start
       })
       .catch(err=>{
           console.log("Oh no! An error occurred computing graph differences.")
           console.log(err)
         })
-
-      // const [graph, nodeMap, edgeMap] = gDiff(this.graph1,this.graph2);
-   
-      // this.gDiff = graph;
-
-      // let rawClusters = decomposeByEdge(graph,nodeMap,edgeMap);
-
-      // this.clusters = formatClusters(rawClusters)
-      
-      // this.nodeClusters = decomposeByNodes(rawClusters,nodeMap)
-
-      // this.nodeClusters.forEach(cluster=>printClusterNodes(cluster))
-
-      // let hGraphNodeMap = clustersToNodeMap(this.nodeClusters);
-
-      // let newHGraph = {
-      //   nodes: Array.from(hGraphNodeMap.values()),
-      //   links: Array.from(nodeMapToEdgeMap(hGraphNodeMap,edgeMap).values()) 
-      // }
-
-      // this.hGraph = newHGraph 
-
-      // this.computeTime = Date.now() - start
-
-
-
 
     }
   }
